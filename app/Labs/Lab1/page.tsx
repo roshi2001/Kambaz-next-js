@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+
 export default function Lab1() {
   return (
     <div id="wd-lab1">
@@ -121,18 +121,16 @@ export default function Lab1() {
       <div id="wd-images">
         <h4>Image tag</h4>
         Loading an image from the internet: <br />
-        <Image
+        <img
           id="wd-starship"
           width="400px"
           src="https://www.staradvertiser.com/wp-content/uploads/2021/08/web1_Starship-gap2.jpg"
           alt="Starship"
-          width={400}
-          height={225}
         />
         <br />
         Loading a local image:
         <br />
-        <Image id="wd-teslabot" src="/images/teslabot.jpg"  width={200} height="200px" alt="Tesla Bot" />
+        <img id="wd-teslabot" src="/images/teslabot.jpg" height="200px" alt="Tesla Bot" />
         </div>
 
       <div id="wd-forms">
@@ -188,8 +186,9 @@ export default function Lab1() {
           onClick={() => {
           const input = document.createElement("input");
           input.type = "file";
-          input.onchange = (e: string) => {
-          const file = e.target.files[0];
+          input.onchange = (e: Event) => {
+          const target = e.target as HTMLInputElement;
+          const file = target.files?.[0];
           if (file) {
           alert(`Selected file: ${file.name}`);
           }
