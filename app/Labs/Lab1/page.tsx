@@ -3,7 +3,9 @@
 export default function Lab1() {
   return (
     <div id="wd-lab1">
-      <h1>Labs</h1>
+
+      <h1>Roshitha Tiruveedhula, CS5610 Fall</h1>
+
       <h2>Lab 1</h2>
       <h3>HTML Examples</h3>
 
@@ -273,7 +275,7 @@ id="wd-text-fields-dob"/><br/>
 Please
 <a href="https://www.lipsum.com" id="wd-lipsum">click here</a>
 to get dummy text<br/>
-<a href="https://github.com/roshi2001/my-webdev-course" id="wd-github">
+<a href="https://github.com/roshi2001/Kambaz-next-js" id="wd-github">
   My GitHub Repository
 </a><br/>
 
