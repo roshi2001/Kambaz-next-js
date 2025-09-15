@@ -5,7 +5,7 @@ export default function TOC() {
     <nav aria-label="Labs navigation">
       <ul>
         <li>
-          <Link href="/Labs" id="wd-labs-home-link">Home</Link>
+          <Link href="/Labs" id="wd-labs-home-link">Labs</Link>
         </li>
         <li>
           <Link href="/Labs/Lab1" id="wd-lab1-link">Lab 1</Link>

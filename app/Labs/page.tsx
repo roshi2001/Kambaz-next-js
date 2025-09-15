@@ -1,9 +1,7 @@
 import Link from "next/link";
-
-
 export default function Page() {
   return (
-    <div id="wd-labs" style={{ padding: "1rem 0" }}>
+  <div id="wd-labs" style={{ padding: "1rem 0" }}>
       <header>
         <h1
           id="wd-labs-heading"
