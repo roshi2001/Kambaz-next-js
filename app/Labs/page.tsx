@@ -31,7 +31,7 @@ export default function Page() {
           </Link>
         </li>
         <li>
-          <Link href="/" id="wd-kambaz-link" style={{ fontSize: "1.125rem" }}>
+          <Link href="/Account/Signin" id="wd-kambaz-link" style={{ fontSize: "1.125rem" }}>
             Kambaz
           </Link>
         </li>
