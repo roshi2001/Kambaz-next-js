@@ -1,7 +1,11 @@
+
+
 "use client";
+
 
 export default function Lab1() {
   return (
+    
     <div id="wd-lab1">
 
       <h1>Roshitha Tiruveedhula, CS5610 Fall</h1>

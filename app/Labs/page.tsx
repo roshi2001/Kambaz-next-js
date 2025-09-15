@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+
 export default function Page() {
   return (
     <div id="wd-labs" style={{ padding: "1rem 0" }}>
