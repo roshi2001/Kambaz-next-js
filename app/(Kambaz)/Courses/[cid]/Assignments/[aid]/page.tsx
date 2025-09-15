@@ -19,7 +19,7 @@ export default function AssignmentEditor() {
                 <label htmlFor="wd-points">Points</label>
               </td>
               <td>
-                <input id="wd-points" value={100} />
+                <input id="wd-points" value={100} readOnly />
               </td>
             </tr>
   
