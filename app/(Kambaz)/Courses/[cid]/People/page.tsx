@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation";
-
-export default function Page() {
-  redirect("https://northeastern.instructure.com/courses/225999/users");
-}
+export default function People() {
+    return (
+      <div>
+        <h2>People</h2>
+      </div>
+  );}
