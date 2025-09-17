@@ -1,6 +1,6 @@
-export default function Calender() {
+export default function Calendar() {
     return (
       <div>
-        <h2>Calender</h2>
+        <h2>Calendar</h2>
       </div>
   );}
