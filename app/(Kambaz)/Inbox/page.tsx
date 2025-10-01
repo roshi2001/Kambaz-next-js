@@ -3,4 +3,5 @@ export default function Inbox() {
       <div>
         <h2>Inbox</h2>
       </div>
-  );}
+ );}
+
