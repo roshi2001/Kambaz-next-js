@@ -1,7 +1,7 @@
-export default function Calender() {
+export default function Calander() {
     return (
       <div>
-        <h2>calender</h2>
+        <h2>Calander</h2>
       </div>
   );}
   
