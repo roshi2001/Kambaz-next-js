@@ -1,38 +1,29 @@
-import Link from "next/link";
 
+import { Nav, NavItem, NavLink } from "react-bootstrap";
+import Link from "next/link";
 export default function TOC() {
-  return (
-    <nav aria-label="Labs navigation">
-      <ul>
-        <li>
-          <Link href="/Labs" id="wd-labs-home-link">Labs</Link>
-        </li>
-        <li>
-          <Link href="/Labs/Lab1" id="wd-lab1-link">Lab 1</Link>
-        </li>
-        <li>
-          <Link href="/Labs/Lab2" id="wd-lab2-link">Lab 2</Link>
-        </li>
-        <li>
-          <Link href="/Labs/Lab3" id="wd-lab3-link">Lab 3</Link>
-        </li>
-        <li>
-          <Link href="/Account/Signin" id="wd-kambaz-link">Kambaz</Link>
-        </li>
-        <li>
-          <a
-            href="https://github.com/roshi2001/Kambaz-next-js"
-            id="wd-github-link"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub
-          </a>
-        </li>
-      </ul>
-    </nav>
-  );
-}
+ return (
+   <Nav variant="pills">
+     <NavItem>
+       <NavLink href="/Labs" as={Link}>Labs</NavLink>
+     </NavItem>
+     <NavItem>
+       <NavLink href="/Labs/Lab1" as={Link}>Lab 1</NavLink>
+     </NavItem>
+     <NavItem>
+       <NavLink href="/Labs/Lab2" as={Link}>Lab 2</NavLink>
+     </NavItem>
+     <NavItem>
+       <NavLink href="/Labs/Lab3" as={Link}>Lab 3</NavLink>
+     </NavItem>
+     <NavItem>
+       <NavLink href="/Account/Signin" as={Link}>Kambaz</NavLink>
+     </NavItem>
+     <NavItem>
+       <NavLink href="https://github.com/roshi2001/Kambaz-next-js">My GitHub</NavLink>
+     </NavItem>
+   </Nav>
+);}
 
 
 
