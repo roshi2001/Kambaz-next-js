@@ -105,11 +105,11 @@ export default function AssignmentEditor() {
                 </Form.Select>
 
                 <div className="mb-2 fw-semibold">Online Entry Options</div>
-                <Form.Check type="checkbox" id="wd-text-entry" label="Text Entry" className="mb-1" size="sm" />
-                <Form.Check type="checkbox" id="wd-website-url" label="Website URL" defaultChecked className="mb-1" size="sm" />
-                <Form.Check type="checkbox" id="wd-media-recordings" label="Media Recordings" className="mb-1" size="sm" />
-                <Form.Check type="checkbox" id="wd-student-annotation" label="Student Annotation" className="mb-1" size="sm" />
-                <Form.Check type="checkbox" id="wd-file-upload" label="File Uploads" size="sm" />
+                <Form.Check type="checkbox" id="wd-text-entry" label="Text Entry" className="mb-1"  />
+                <Form.Check type="checkbox" id="wd-website-url" label="Website URL" defaultChecked className="mb-1"  />
+                <Form.Check type="checkbox" id="wd-media-recordings" label="Media Recordings" className="mb-1"  />
+                <Form.Check type="checkbox" id="wd-student-annotation" label="Student Annotation" className="mb-1" />
+                <Form.Check type="checkbox" id="wd-file-upload" label="File Uploads"  />
               </Card.Body>
             </Card>
           </Col>
