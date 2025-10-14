@@ -20,7 +20,7 @@ export default function BootstrapForms() {
     <div id="wd-css-styling-forms">
       <h2>Forms</h2>
 
-      {/* Basic controls */}
+      
       <FormLabel>Email address</FormLabel>
       <FormControl type="email" placeholder="name@example.com" />
 
@@ -37,7 +37,7 @@ export default function BootstrapForms() {
           <option value="3">Three</option>
         </FormSelect>
 
-        {/* Switches */}
+        
         <div id="wd-css-styling-switches">
           <h3>Switches</h3>
           <FormCheck type="switch" defaultChecked={false} label="Unchecked switch checkbox input" />
@@ -45,13 +45,13 @@ export default function BootstrapForms() {
           <FormCheck type="switch" defaultChecked={false} label="Unchecked disabled switch checkbox input" disabled />
           <FormCheck type="switch" defaultChecked label="Checked disabled switch checkbox input" disabled />
 
-          {/* Range */}
+         
           <div id="wd-css-styling-range-and-sliders">
             <h3>Range</h3>
             <FormLabel>Example range</FormLabel>
             <FormRange min="0" max="5" step="0.5" />
 
-            {/* Addons */}
+            
             <div id="wd-css-styling-addons">
               <h3>Addons</h3>
               <InputGroup className="mb-3">
@@ -65,7 +65,7 @@ export default function BootstrapForms() {
                 <InputGroupText>0.00</InputGroupText>
               </InputGroup>
 
-              {/* Responsive forms 1 */}
+              
               <div id="wd-css-responsive-forms-1">
                 <h3>Responsive forms</h3>
 
@@ -96,7 +96,7 @@ export default function BootstrapForms() {
                   </Col>
                 </Row>
 
-                {/* Responsive forms 2 */}
+             
                 <div id="wd-css-responsive-forms-2">
                   <h3>Responsive forms 2</h3>
                   <Form>
