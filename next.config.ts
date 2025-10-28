@@ -7,5 +7,8 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true, 
   },
+  turbopack: {
+    root: "C:/Users/roshi/2025/winter/webdev/kambaz-next-js",
+  },
 };
 export default nextConfig;

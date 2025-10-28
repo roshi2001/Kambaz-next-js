@@ -1,29 +1,65 @@
-import { ReactNode } from "react";
-import { courses } from "../../Database";
+"use client";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useParams, useRouter } from "next/navigation";
+import type { RootState } from "@/lib/store";
 import CourseNavigation from "./Navigation";
 import Breadcrumb from "./Breadcrumb";
 
-export default async function CoursesLayout({
-  children,
-  params,
-}: {
-  children: ReactNode;
-  params: Promise<{ cid: string }>;
-}) {
-  const { cid } = await params;
+export default function CourseLayout({ children }: { children: React.ReactNode }) {
+  const { cid } = useParams<{ cid: string }>();
+  const router = useRouter();
 
-  const course = courses.find((course) => course._id === cid);
+  // ✅ use the correct slice keys
+const { currentUser } = useSelector((s: any) => s.accountReducer);
+  const enrollments = useSelector((s: RootState) => s.enrollments.enrollments);
+  const { courses } = useSelector((s: any) => s.coursesReducer);
+
+  // find the course from Redux
+  const course = courses.find((c: any) => String(c._id) === String(cid));
+
+  useEffect(() => {
+    // must be logged in
+    if (!currentUser?._id) {
+      router.replace("/Dashboard");
+      return;
+    }
+    // if course doesn't exist, bounce
+    if (!course) {
+      router.replace("/Dashboard");
+      return;
+    }
+
+    // OPTIONAL STRICT GATE (commented out):
+    // If you want to restrict by enrollment as well, uncomment this block.
+    // const ok = enrollments.some(
+    //   (e) => String(e.user) === String(currentUser._id) && String(e.course) === String(cid)
+    // );
+    // if (!ok) router.replace("/Dashboard");
+  }, [cid, currentUser?._id, course, enrollments, router]);
+
+  const [navOpen, setNavOpen] = useState(true);
+  useEffect(() => {
+    const saved = sessionStorage.getItem("courses-nav-open");
+    if (saved !== null) setNavOpen(saved === "true");
+  }, []);
+  useEffect(() => {
+    sessionStorage.setItem("courses-nav-open", String(navOpen));
+  }, [navOpen]);
 
   return (
-    <div id="wd-courses">
-      <Breadcrumb course={course} />
-      <hr className="my-2" />
-
-      <div className="d-flex">
-        <div className="d-none d-md-block">
+    <div id="wd-courses" className="container-fluid py-3">
+      <Breadcrumb course={course} navOpen={navOpen} onToggle={() => setNavOpen((v) => !v)} />
+      <hr />
+      <div className="d-flex gap-3">
+        <aside
+          id="wd-courses-nav"
+          className={`border-end pe-2 ${navOpen ? "d-block" : "d-none"}`}
+          style={{ width: 170, minWidth: 160 }}
+        >
           <CourseNavigation />
-        </div>
-        <div className="flex-fill">{children}</div>
+        </aside>
+        <main className="flex-fill">{children}</main>
       </div>
     </div>
   );
