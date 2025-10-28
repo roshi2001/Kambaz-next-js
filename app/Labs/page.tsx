@@ -31,6 +31,11 @@ export default function Page() {
           </Link>
         </li>
         <li>
+          <Link href="/Labs/Lab4" id="wd-lab4-link" style={{ fontSize: "1.125rem" }}>
+            Lab 4:
+          </Link>
+        </li>
+        <li>
           <Link href="/Account/Signin" id="wd-kambaz-link" style={{ fontSize: "1.125rem" }}>
             Kambaz
           </Link>
