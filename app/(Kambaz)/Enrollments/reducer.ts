@@ -1,33 +1,55 @@
-"use client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import * as db from "../Database";
 
-export type Enrollment = { user: string; course: string };
-type State = { enrollments: Enrollment[] };
-
-const initialState: State = {
-  // Seed from DB. Changes live in memory only (lost on full page refresh).
-  enrollments: [...db.enrollments],
+export type Enrollment = {
+  _id?: string;
+  user: string;
+  course: string;
 };
 
-const slice = createSlice({
-  name: "enrollments",
+type State = {
+  enrollments: Enrollment[];
+};
+
+const initialState: State = {
+  enrollments: [],
+};
+
+const enrollmentsSlice = createSlice({
+  name: "enrollmentsReducer",
   initialState,
   reducers: {
+    // Replace everything (use after GET from server)
+    setEnrollments: (state, { payload }: PayloadAction<Enrollment[]>) => {
+      state.enrollments = payload;
+    },
+
+    // Add if not enrolled already
     enroll: (state, { payload }: PayloadAction<Enrollment>) => {
       const exists = state.enrollments.some(
-        (e) => e.user === payload.user && e.course === payload.course
+        (e) =>
+          String(e.user) === String(payload.user) &&
+          String(e.course) === String(payload.course)
       );
       if (!exists) state.enrollments.push(payload);
     },
+
+    // Remove match
     unenroll: (state, { payload }: PayloadAction<Enrollment>) => {
       state.enrollments = state.enrollments.filter(
-        (e) => !(e.user === payload.user && e.course === payload.course)
+        (e) =>
+          !(
+            String(e.user) === String(payload.user) &&
+            String(e.course) === String(payload.course)
+          )
       );
     },
+
+    // Toggle enroll/un-enroll
     toggleEnrollment: (state, { payload }: PayloadAction<Enrollment>) => {
       const i = state.enrollments.findIndex(
-        (e) => e.user === payload.user && e.course === payload.course
+        (e) =>
+          String(e.user) === String(payload.user) &&
+          String(e.course) === String(payload.course)
       );
       if (i >= 0) state.enrollments.splice(i, 1);
       else state.enrollments.push(payload);
@@ -35,11 +57,11 @@ const slice = createSlice({
   },
 });
 
-export const { enroll, unenroll, toggleEnrollment } = slice.actions;
-export default slice.reducer;
+export const {
+  setEnrollments,
+  enroll,
+  unenroll,
+  toggleEnrollment,
+} = enrollmentsSlice.actions;
 
-export const isEnrolledSelector = (s: any, userId: string, courseId: string) =>
-  s.enrollments.enrollments.some(
-    (e: Enrollment) => String(e.user) === String(userId) &&
-                       String(e.course) === String(courseId)
-  );
+export default enrollmentsSlice.reducer;

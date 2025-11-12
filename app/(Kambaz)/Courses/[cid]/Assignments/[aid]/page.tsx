@@ -1,10 +1,23 @@
 "use client";
-import { useEffect, useRef } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useRouter } from "next/navigation";
 import { Form, Row, Col, Card, InputGroup, Button } from "react-bootstrap";
 import type { RootState } from "@/lib/store";
-import { updateAssignment } from "../../Assignments/reducer";
+import { setAssignments } from "../../Assignments/reducer";
+import * as client from "../../../client";
+
+type Assignment = {
+  _id: string;
+  title: string;
+  course: string | number;
+  description?: string;
+  availableFrom?: string;
+  availableUntil?: string;
+  dueDate?: string;
+  points?: number;
+};
 
 const isoToLocalInput = (iso?: string) => {
   if (!iso) return "";
@@ -13,7 +26,6 @@ const isoToLocalInput = (iso?: string) => {
     .toISOString()
     .slice(0, 16);
 };
-
 const localInputToISO = (local?: string) =>
   local ? new Date(local).toISOString() : undefined;
 
@@ -22,56 +34,75 @@ export default function AssignmentEditor() {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  // redirect to /new if aid === "new"
-  useEffect(() => {
-    if (aid === "new") router.replace(`/Courses/${cid}/Assignments/new`);
-  }, [aid, cid, router]);
-  if (aid === "new") return null;
+  const assignments = useSelector(
+    (s: RootState) => s.assignments.assignments
+  ) as Assignment[];
 
-  // ✅ pull from Redux
-  const a = useSelector((s: RootState) =>
-    s.assignments.assignments.find(
-      (x) => x._id === aid && String(x.course) === String(cid)
-    )
+  const [a, setA] = useState<Assignment | undefined>(
+    assignments.find((x) => x._id === aid && String(x.course) === String(cid))
   );
 
-  if (!a) {
-    return (
-      <div className="p-3">
-        <h5>Assignment not found</h5>
-        <Button
-          variant="secondary"
-          onClick={() => router.push(`/Courses/${cid}/Assignments`)}
-        >
-          Back
-        </Button>
-      </div>
-    );
-  }
-
+  /* -------------------- MOVE REFS ABOVE ANY EARLY RETURN (FIX) -------------------- */
   const nameRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
   const pointsRef = useRef<HTMLInputElement>(null);
   const dueRef = useRef<HTMLInputElement>(null);
   const fromRef = useRef<HTMLInputElement>(null);
   const untilRef = useRef<HTMLInputElement>(null);
+  /* ------------------------------------------------------------------------------- */
 
-  const onSave = () => {
+  useEffect(() => {
+    if (aid === "new") {
+      router.replace(`/Courses/${cid}/Assignments/new`);
+    }
+  }, [aid, cid, router]);
+
+  useEffect(() => {
+    if (a || !aid) return;
+    (async () => {
+      const one = await client.findAssignmentById(String(aid)).catch(() => null); // cast
+      if (one) {
+        setA(one);
+      } else {
+        const rows = await client.findAssignmentsForCourse(String(cid));
+        dispatch(setAssignments(rows));
+        setA(rows.find((x: Assignment) => x._id === aid));
+      }
+    })();
+  }, [a, aid, cid, dispatch]);
+
+  // keep the guard, but it's now AFTER all hooks were created
+  if (aid === "new") return null;
+
+  if (!a) {
+    return (
+      <div className="p-3">
+        <h5>Assignment not found</h5>
+        <Button variant="secondary" onClick={() => router.push(`/Courses/${cid}/Assignments`)}>
+          Back
+        </Button>
+      </div>
+    );
+  }
+
+  const onSave = async () => {
     const ptsRaw = Number(pointsRef.current?.value ?? 0);
     const points = Number.isFinite(ptsRaw) ? ptsRaw : 0;
 
-    dispatch(
-      updateAssignment({
-        _id: a._id,
-        course: String(cid),
-        title: nameRef.current?.value ?? "",
-        description: descRef.current?.value ?? "",
-        points,
-        dueDate: localInputToISO(dueRef.current?.value || ""),
-        availableFrom: localInputToISO(fromRef.current?.value || ""),
-        availableUntil: localInputToISO(untilRef.current?.value || ""),
-      }) as any
-    );
+    const payload: Assignment = {
+      _id: a._id,
+      course: String(cid),
+      title: nameRef.current?.value?.trim() || "",
+      description: descRef.current?.value ?? "",
+      points,
+      dueDate: localInputToISO(dueRef.current?.value || ""),
+      availableFrom: localInputToISO(fromRef.current?.value || ""),
+      availableUntil: localInputToISO(untilRef.current?.value || ""),
+    };
+
+    const updated = await client.updateAssignment(payload);
+    const next = assignments.map((x) => (x._id === updated._id ? updated : x));
+    dispatch(setAssignments(next));
 
     router.push(`/Courses/${cid}/Assignments`);
   };
@@ -79,11 +110,6 @@ export default function AssignmentEditor() {
   return (
     <div className="container py-4" id="wd-assignment-editor">
       <Form style={{ maxWidth: 920 }}>
-        {/* ---------------------------
-              BASIC FIELDS
-        ----------------------------*/}
-
-        {/* Name */}
         <Form.Group className="mb-3">
           <Form.Label>Assignment Name</Form.Label>
           <Form.Control
@@ -95,7 +121,6 @@ export default function AssignmentEditor() {
           />
         </Form.Group>
 
-        {/* Description */}
         <Form.Group className="mb-4" style={{ maxWidth: 920 }}>
           <Form.Label>Description</Form.Label>
           <Form.Control
@@ -108,7 +133,6 @@ export default function AssignmentEditor() {
           />
         </Form.Group>
 
-        {/* Points */}
         <Row className="mb-3 align-items-start">
           <Col sm={3} className="text-sm-end">
             <Form.Label>Points</Form.Label>
@@ -125,11 +149,6 @@ export default function AssignmentEditor() {
           </Col>
         </Row>
 
-        {/* ---------------------------
-              EXTRA UI ONLY
-        ----------------------------*/}
-
-        {/* Assignment Group */}
         <Row className="mb-3 align-items-start">
           <Col sm={3} className="text-sm-end">
             <Form.Label>Assignment Group</Form.Label>
@@ -144,7 +163,6 @@ export default function AssignmentEditor() {
           </Col>
         </Row>
 
-        {/* Display Grade as */}
         <Row className="mb-3 align-items-start">
           <Col sm={3} className="text-sm-end">
             <Form.Label>Display Grade as</Form.Label>
@@ -158,7 +176,6 @@ export default function AssignmentEditor() {
           </Col>
         </Row>
 
-        {/* Submission Type Section */}
         <Row className="mb-3 align-items-start">
           <Col sm={3} className="text-sm-end">
             <Form.Label>Submission Type</Form.Label>
@@ -182,10 +199,6 @@ export default function AssignmentEditor() {
             </Card>
           </Col>
         </Row>
-
-        {/* ---------------------------
-              DATE FIELDS
-        ----------------------------*/}
 
         <Row className="mb-4 align-items-start">
           <Col sm={3} className="text-sm-end">
@@ -234,7 +247,6 @@ export default function AssignmentEditor() {
 
         <hr className="mb-3" />
 
-        {/* Actions */}
         <Row>
           <Col sm={{ span: 9, offset: 3 }} className="text-end">
             <Button

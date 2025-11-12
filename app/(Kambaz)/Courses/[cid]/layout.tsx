@@ -10,32 +10,26 @@ export default function CourseLayout({ children }: { children: React.ReactNode }
   const { cid } = useParams<{ cid: string }>();
   const router = useRouter();
 
-  // ✅ use the correct slice keys
+ 
 const { currentUser } = useSelector((s: any) => s.accountReducer);
   const enrollments = useSelector((s: RootState) => s.enrollments.enrollments);
   const { courses } = useSelector((s: any) => s.coursesReducer);
 
-  // find the course from Redux
   const course = courses.find((c: any) => String(c._id) === String(cid));
 
   useEffect(() => {
-    // must be logged in
+    
     if (!currentUser?._id) {
       router.replace("/Dashboard");
       return;
     }
-    // if course doesn't exist, bounce
+    
     if (!course) {
       router.replace("/Dashboard");
       return;
     }
 
-    // OPTIONAL STRICT GATE (commented out):
-    // If you want to restrict by enrollment as well, uncomment this block.
-    // const ok = enrollments.some(
-    //   (e) => String(e.user) === String(currentUser._id) && String(e.course) === String(cid)
-    // );
-    // if (!ok) router.replace("/Dashboard");
+    
   }, [cid, currentUser?._id, course, enrollments, router]);
 
   const [navOpen, setNavOpen] = useState(true);
