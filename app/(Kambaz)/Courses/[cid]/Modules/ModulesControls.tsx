@@ -1,3 +1,4 @@
+"use client";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 import ModuleEditor from "./ModuleEditor";

@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { useParams, useRouter } from "next/navigation";
 import { addAssignment } from "../reducer";
 import { Form, Row, Col, Card, InputGroup, Button } from "react-bootstrap";
+import * as client from "../../../client";                
 
 const localToISO = (v?: string) => (v ? new Date(v).toISOString() : undefined);
 
@@ -19,24 +20,28 @@ export default function NewAssignmentEditor() {
   const fromRef = useRef<HTMLInputElement>(null);
   const untilRef = useRef<HTMLInputElement>(null);
 
-  const onSave = () => {
+  const onSave = async () => {                            
     const title = (nameRef.current?.value || "").trim();
     if (!title) return;
 
     const ptsRaw = Number(pointsRef.current?.value ?? 0);
     const points = Number.isFinite(ptsRaw) ? ptsRaw : 0;
 
-    dispatch(
-      addAssignment({
-        course: String(cid),
-        title,
-        description: (descRef.current?.value || "").trim(),
-        points,
-        dueDate: localToISO(dueRef.current?.value || ""),
-        availableFrom: localToISO(fromRef.current?.value || ""),
-        availableUntil: localToISO(untilRef.current?.value || ""),
-      }) as any
-    );
+    const payload = {
+      course: String(cid),
+      title,
+      description: (descRef.current?.value || "").trim(),
+      points,
+      dueDate: localToISO(dueRef.current?.value || ""),
+      availableFrom: localToISO(fromRef.current?.value || ""),
+      availableUntil: localToISO(untilRef.current?.value || ""),
+    };
+
+    
+    const created = await client.createAssignmentForCourse(String(cid), payload);
+
+    
+    dispatch(addAssignment(created) as any);
 
     router.push(`/Courses/${cid}/Assignments`);
   };

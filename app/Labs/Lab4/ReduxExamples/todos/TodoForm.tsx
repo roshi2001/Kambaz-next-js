@@ -12,7 +12,7 @@ export default function TodoForm() {
       className="rounded-3 border d-flex flex-column gap-2 p-3"
       style={{ maxWidth: 680 }}
     >
-      {/* Top row: Update (yellow), Add (green) */}
+      
       <div className="d-flex gap-2">
         <Button
           id="wd-add-todo-click"
@@ -32,7 +32,7 @@ export default function TodoForm() {
         </Button>
       </div>
 
-      {/* Input below, full width with nice rounding */}
+      
       <FormControl
         id="wd-todo-title"
         value={todo.title ?? ""}

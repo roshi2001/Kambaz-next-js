@@ -1,21 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
-import type { RootState } from "@reduxjs/toolkit/query";
-import { useDispatch } from "react-redux";
-import { deleteAssignment } from "./reducer";
-import { FaTrash } from "react-icons/fa";
-
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/lib/store";
+import { setAssignments } from "./reducer";
+import * as client from "../../client";
+import { FaTrash, FaRegFileAlt } from "react-icons/fa";
 import AssignmentControlButtons from "./AssignmentControlButtons";
 import LessonControlButtons from "../Modules/LessonControlButtons";
-
 import { ListGroup, ListGroupItem, InputGroup, Form } from "react-bootstrap";
 import Dropdown from "react-bootstrap/Dropdown";
 import { BsSearch, BsGripVertical } from "react-icons/bs";
-import { FaRegFileAlt } from "react-icons/fa";
 
 type Assignment = {
   _id: string;
@@ -39,31 +36,41 @@ function fmtDate(iso?: string) {
   return `${month} ${day} at ${hours}:${minutes}${ampm}`;
 }
 
-export default function Assignments() {
+export default function AssignmentsPage() {
   const { cid } = useParams<{ cid: string }>();
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  const all = useSelector(
+    (s: RootState) => s.assignments.assignments
+  ) as Assignment[];
+
   const [query, setQuery] = useState("");
 
-  
-  const all = useSelector((s: RootState) => s.assignments.assignments) as Assignment[];
+  useEffect(() => {
+    if (!cid) return;
+    (async () => {
+      const rows = await client.findAssignmentsForCourse(cid as string);
+      dispatch(setAssignments(rows));
+    })();
+  }, [cid, dispatch]);
 
   const assignments = useMemo(() => {
-    const forCourse = all.filter((a) => String(a.course) === String(cid));
+    const forCourse = (all ?? []).filter((a) => String(a.course) === String(cid));
     const q = query.trim().toLowerCase();
     return q ? forCourse.filter((a) => a.title.toLowerCase().includes(q)) : forCourse;
   }, [all, cid, query]);
-  const dispatch = useDispatch();
 
-const handleDelete = (id: string) => {
-  if (confirm("Are you sure you want to delete this assignment?")) {
-    dispatch(deleteAssignment(id));
-  }
-};
-
+  const handleDelete = async (id: string) => {
+    if (!id) return;
+    if (!confirm("Are you sure you want to delete this assignment?")) return;
+    await client.deleteAssignment(id);
+    dispatch(setAssignments((all ?? []).filter((a) => a._id !== id)));
+  };
 
   return (
     <ListGroup id="wd-assignments" className="rounded-0">
-     
+      {/* Top bar */}
       <ListGroupItem className="d-flex align-items-center border-0 px-0">
         <InputGroup style={{ maxWidth: 360 }}>
           <InputGroup.Text className="bg-white">
@@ -80,12 +87,12 @@ const handleDelete = (id: string) => {
         <div className="ms-auto">
           <button className="fs-5 btn btn-light btn-sm me-2 border">+ Group</button>
           <button
-  className="fs-5 btn btn-danger btn-sm"
-  id="wd-new-assignment-btn"
-  onClick={() => router.push(`/Courses/${cid}/Assignments/new`)}
->
-  + Assignment
-</button>
+            className="fs-5 btn btn-danger btn-sm"
+            id="wd-new-assignment-btn"
+            onClick={() => router.push(`/Courses/${cid}/Assignments/new`)}  
+          >
+            + Assignment
+          </button>
         </div>
       </ListGroupItem>
 
@@ -119,7 +126,7 @@ const handleDelete = (id: string) => {
         </div>
       </ListGroupItem>
 
-     
+      {/* List */}
       <ListGroupItem className="p-0 border-0">
         <ListGroup id="wd-assignment-list" className="rounded-0">
           {assignments.length === 0 ? (
@@ -155,7 +162,7 @@ const handleDelete = (id: string) => {
                   <div className="flex-grow-1">
                     <div className="fs-5 fw-semibold text-dark">
                       <Link
-                        href={`/Courses/${cid}/Assignments/${a._id}`}
+                        href={`/Courses/${cid}/Assignments/${a._id}`}  
                         id={`wd-assignment-${a._id}-link`}
                         className="text-decoration-none text-dark"
                       >
@@ -178,11 +185,13 @@ const handleDelete = (id: string) => {
                   </div>
 
                   <button
-        className="btn btn-sm text-danger border-0 ms-2"
-        onClick={() => handleDelete(a._id)}
-      >
-        <FaTrash />
-      </button>
+                    className="btn btn-sm text-danger border-0 ms-2"
+                    onClick={() => handleDelete(a._id)}
+                    aria-label="Delete assignment"
+                    title="Delete assignment"
+                  >
+                    <FaTrash />
+                  </button>
 
                   <div className="ms-3 d-flex align-items-center">
                     <LessonControlButtons />
