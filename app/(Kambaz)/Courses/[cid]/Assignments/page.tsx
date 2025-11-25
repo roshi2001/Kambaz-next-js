@@ -18,8 +18,8 @@ type Assignment = {
   _id: string;
   title: string;
   course: string | number;
-  availableFrom?: string;
-  dueDate?: string;
+  available?: string;
+  due?: string;
   points?: number;
 };
 
@@ -70,7 +70,6 @@ export default function AssignmentsPage() {
 
   return (
     <ListGroup id="wd-assignments" className="rounded-0">
-      {/* Top bar */}
       <ListGroupItem className="d-flex align-items-center border-0 px-0">
         <InputGroup style={{ maxWidth: 360 }}>
           <InputGroup.Text className="bg-white">
@@ -173,12 +172,12 @@ export default function AssignmentsPage() {
                     <div className="fs-6 text-muted">
                       <span className="text-danger">Multiple Modules</span>
                       <span className="mx-2">|</span>
-                      <b>Not available until</b> {fmtDate(a.availableFrom)}
+                      <b>Not available until</b> {fmtDate(a.available)}
                       <span className="mx-2">|</span>
                     </div>
 
                     <div className="text-muted small">
-                      <b>Due</b> {fmtDate(a.dueDate)}
+                      <b>Due</b> {fmtDate(a.due)}
                       <span className="mx-2">|</span>
                       {a.points ?? 0} pts
                     </div>

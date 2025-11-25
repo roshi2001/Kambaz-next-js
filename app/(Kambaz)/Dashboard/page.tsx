@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import * as courseClient from "../Courses/client";             // fetchAllCourses, findMyCourses, CRUD
-import * as enrollClient from "../Enrollments/client";         // enrollments API
+import * as courseClient from "../Courses/client";
+        
 import {
   FormControl,
   Row,
@@ -28,7 +28,6 @@ export default function Dashboard() {
   );
   const dispatch = useDispatch();
 
-  // local draft course state (unchanged)
   const [course, setCourse] = useState<any>({
     _id: "0",
     name: "New Course",
@@ -39,10 +38,8 @@ export default function Dashboard() {
     description: "New Description",
   });
 
-  // Toggle: My Courses (default) vs All Courses
   const [showAll, setShowAll] = useState(false);
 
-  // Load courses depending on toggle
   const fetchCourses = async (all: boolean) => {
     try {
       const rows = all
@@ -54,23 +51,27 @@ export default function Dashboard() {
     }
   };
 
-  // Initial + when user/toggle changes: load courses and enrollments
+  const fetchEnrollments = async () => {
+    if (!currentUser?._id) return;
+    try {
+      // Just fetch the enrolled courses and convert to enrollment format
+      const enrolledCourses = await courseClient.findMyCourses();
+      const enrollments = enrolledCourses.map((c: any) => ({
+        _id: `${currentUser._id}-${c._id}`,
+        user: currentUser._id,
+        course: c._id
+      }));
+      dispatch(setEnrollments(enrollments));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     fetchCourses(showAll);
-    (async () => {
-      if (!currentUser?._id) return;
-      try {
-        const rows = await enrollClient.findEnrollmentsForUser(
-          String(currentUser._id)
-        );
-        dispatch(setEnrollments(rows));
-      } catch (e) {
-        console.error(e);
-      }
-    })();
+    fetchEnrollments();
   }, [currentUser, showAll, dispatch]);
 
-  // Helpers
   const getEnrollment = (uid: string, cid: string) =>
     reduxEnrollments.find(
       (e) => String(e.user) === String(uid) && String(e.course) === String(cid)
@@ -79,7 +80,6 @@ export default function Dashboard() {
   const isEnrolled = (cid: string) =>
     !!getEnrollment(String(currentUser?._id ?? ""), String(cid));
 
-  // What to display
   const visibleCourses = useMemo(() => {
     if (!currentUser?._id) return [];
     if (showAll) return courses;
@@ -92,27 +92,11 @@ export default function Dashboard() {
     );
   }, [showAll, currentUser?._id, courses, reduxEnrollments]);
 
-  // Course CRUD (unchanged) — auto-enroll creator on Add
   const onAddNewCourse = async () => {
     const newCourse = await courseClient.createCourse(course);
     dispatch(setCourses([...courses, newCourse]));
-    if (currentUser?._id && newCourse?._id) {
-      try {
-        const created = await enrollClient.enrollInCourse(
-          String(currentUser._id),
-          String(newCourse._id)
-        );
-        dispatch(
-          toggleEnrollment({
-            user: created.user,
-            course: created.course,
-            _id: created._id,
-          })
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    // Enrollment is created on backend, just refresh
+    await fetchEnrollments();
   };
 
   const onDeleteCourse = async (courseId: string) => {
@@ -189,7 +173,7 @@ export default function Dashboard() {
               style={{ width: "300px" }}
             >
               <Card className="position-relative">
-                {currentUser?._id && (
+                {currentUser?._id && showAll && (
                   <button
                     className={`btn btn-sm position-absolute top-0 end-0 m-2 ${
                       isEnrolled(course._id) ? "btn-danger" : "btn-success"
@@ -203,26 +187,18 @@ export default function Dashboard() {
                       const cid = String(course._id);
                       try {
                         if (isEnrolled(cid)) {
-                          const enr = getEnrollment(uid, cid);
-                          if (enr?._id) {
-                            await enrollClient.unenrollById(enr._id);
-                          } else {
-                            await enrollClient.unenrollByPair(uid, cid);
-                          }
+                          await courseClient.unenrollFromCourse(uid, cid);
                           dispatch(toggleEnrollment({ user: uid, course: cid }));
                         } else {
-                          const created = await enrollClient.enrollInCourse(
-                            uid,
-                            cid
-                          );
-                          dispatch(
-                            toggleEnrollment({
-                              user: created.user,
-                              course: created.course,
-                              _id: created._id,
-                            })
-                          );
+                          await courseClient.enrollIntoCourse(uid, cid);
+                          dispatch(toggleEnrollment({
+                            user: uid,
+                            course: cid,
+                            _id: `${uid}-${cid}`
+                          }));
                         }
+                        
+                        await fetchEnrollments();
                       } catch (e) {
                         console.error(e);
                       }
@@ -255,17 +231,6 @@ export default function Dashboard() {
                     </CardText>
 
                     <Button variant="primary">Go</Button>
-
-                    <button
-                      className="btn btn-danger"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        onDeleteCourse(course._id);
-                      }}
-                    >
-                      Delete
-                    </button>
-
                     <button
                       id="wd-edit-course-click"
                       onClick={(event) => {
@@ -275,6 +240,15 @@ export default function Dashboard() {
                       className="btn btn-warning me-2 float-end"
                     >
                       Edit
+                    </button>
+                    <button
+                      className="btn btn-danger float-end"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        onDeleteCourse(course._id);
+                      }}
+                    >
+                      Delete
                     </button>
                   </CardBody>
                 </Link>

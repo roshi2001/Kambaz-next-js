@@ -15,7 +15,7 @@ export default function PeopleDetails({
   onClose: () => void;
 }) {
   const [user, setUser] = useState<any>({});
-  const [name, setName] = useState("");
+  
   const [editing, setEditing] = useState(false);
 
   const fetchUser = async () => {
@@ -25,13 +25,12 @@ export default function PeopleDetails({
   };
 
   const saveUser = async () => {
-    const [firstName, lastName] = name.split(" ");
-    const updatedUser = { ...user, firstName, lastName };
-    await client.updateUser(updatedUser);
-    setUser(updatedUser);
-    setEditing(false);
-    onClose();
-  };
+  const updated = await client.updateUser(user); 
+  setUser(updated);
+  setEditing(false);
+  onClose();
+};
+
 
   const deleteUser = async (uid: string) => {
     await client.deleteUser(uid);
@@ -47,7 +46,7 @@ export default function PeopleDetails({
   return (
     <div className="wd-people-details position-fixed top-0 end-0 bottom-0 bg-white p-4 shadow w-25">
 
-      {/* CLOSE BUTTON */}
+      
       <button
         onClick={onClose}
         className="btn position-absolute end-0 top-0 mt-2 me-2 wd-close-details"
@@ -55,17 +54,17 @@ export default function PeopleDetails({
         <IoCloseSharp className="fs-1" />
       </button>
 
-      {/* USER ICON */}
+      
       <div className="text-center mt-3">
         <FaUserCircle className="text-secondary fs-1" />
       </div>
 
       <hr />
 
-      {/* NAME + EDITING */}
+      
       <div className="text-danger fs-4 fw-bold text-center mb-3">
 
-        {/* Pencil button */}
+        
         {!editing && (
           <FaPencil
             onClick={() => setEditing(true)}
@@ -73,7 +72,7 @@ export default function PeopleDetails({
           />
         )}
 
-        {/* Save button */}
+        
         {editing && (
           <FaCheck
             onClick={saveUser}
@@ -81,27 +80,35 @@ export default function PeopleDetails({
           />
         )}
 
-        {/* Name display */}
+        
         {!editing && (
           <div className="wd-name" onClick={() => setEditing(true)}>
             {user.firstName} {user.lastName}
           </div>
         )}
 
-        {/* Name editing */}
+        
         {editing && (
-          <FormControl
-            className="w-50 wd-edit-name"
-            defaultValue={`${user.firstName} ${user.lastName}`}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") saveUser();
-            }}
-          />
-        )}
+  <>
+    <FormControl
+      className="mb-2"
+      value={user.firstName || ""}
+      onChange={(e) =>
+        setUser({ ...user, firstName: e.target.value })
+      }
+    />
+    <FormControl
+      className="mb-2"
+      value={user.lastName || ""}
+      onChange={(e) =>
+        setUser({ ...user, lastName: e.target.value })
+      }
+    />
+  </>
+)}
       </div>
 
-      {/* DETAILS */}
+      
       <div className="ms-2">
         <p className="mb-1">
           <b>Role:</b> <span className="wd-role">{user.role}</span>
@@ -119,7 +126,7 @@ export default function PeopleDetails({
 
         <hr />
 
-        {/* Buttons */}
+        
         <button
           onClick={() => deleteUser(uid)}
           className="btn btn-danger float-end wd-delete"

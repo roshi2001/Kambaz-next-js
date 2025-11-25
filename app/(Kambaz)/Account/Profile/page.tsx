@@ -7,7 +7,16 @@ import { Button, FormControl } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 
 export default function Profile() {
-  const [profile, setProfile] = useState<any>({});
+  const [profile, setProfile] = useState<any>({
+  username: "",
+  password: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  dob: "",
+  role: "STUDENT"
+});
+
   const dispatch = useDispatch();
   const router = useRouter();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
@@ -31,6 +40,12 @@ export default function Profile() {
     }
     router.replace("/Account/Signin");
   };
+  useEffect(() => {
+  if (currentUser) {
+    setProfile(currentUser);
+  }
+}, [currentUser]);
+
 
   const signout = async () => {
     await client.signout();
@@ -38,7 +53,7 @@ export default function Profile() {
     router.replace("/Account/Signin");
   };
 
-  useEffect(() => { fetchProfile(); /* run once */ }, []);
+  useEffect(() => { fetchProfile();  }, []);
 
   return (
     <div className="wd-profile-screen">
@@ -48,7 +63,7 @@ export default function Profile() {
           <FormControl
             id="wd-username"
             className="mb-2"
-            defaultValue={profile.username}
+            value={profile.username}
             placeholder="Username"
             onChange={(e) => setProfile({ ...profile, username: e.target.value })}
           />
@@ -56,21 +71,21 @@ export default function Profile() {
             id="wd-password"
             className="mb-2"
             type="text"
-            defaultValue={profile.password}
+            value={profile.password}
             placeholder="Password"
             onChange={(e) => setProfile({ ...profile, password: e.target.value })}
           />
           <FormControl
             id="wd-firstname"
             className="mb-2"
-            defaultValue={profile.firstName}
+            value={profile.firstName}
             placeholder="First name"
             onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
           />
           <FormControl
             id="wd-lastname"
             className="mb-2"
-            defaultValue={profile.lastName}
+            value={profile.lastName}
             placeholder="Last name"
             onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
           />
@@ -78,21 +93,21 @@ export default function Profile() {
             id="wd-dob"
             className="mb-2"
             type="date"
-            defaultValue={profile.dob}
+            value={profile.dob}
             placeholder="Date of birth"
             onChange={(e) => setProfile({ ...profile, dob: e.target.value })}
           />
           <FormControl
             id="wd-email"
             className="mb-2"
-            defaultValue={profile.email}
+            value={profile.email}
             placeholder="Email"
             onChange={(e) => setProfile({ ...profile, email: e.target.value })}
           />
           <select
             className="form-control mb-2"
             id="wd-role"
-            defaultValue={profile.role}
+            value={profile.role}
             onChange={(e) => setProfile({ ...profile, role: e.target.value })}
           >
             <option value="USER">User</option>

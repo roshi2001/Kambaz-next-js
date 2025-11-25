@@ -32,8 +32,8 @@ export default function NewAssignmentEditor() {
       title,
       description: (descRef.current?.value || "").trim(),
       points,
-      dueDate: localToISO(dueRef.current?.value || ""),
-      availableFrom: localToISO(fromRef.current?.value || ""),
+      due: localToISO(dueRef.current?.value || ""),
+      available: localToISO(fromRef.current?.value || ""),
       availableUntil: localToISO(untilRef.current?.value || ""),
     };
 

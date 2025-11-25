@@ -13,9 +13,9 @@ type Assignment = {
   title: string;
   course: string | number;
   description?: string;
-  availableFrom?: string;
+  available?: string;
   availableUntil?: string;
-  dueDate?: string;
+  due?: string;
   points?: number;
 };
 
@@ -42,14 +42,14 @@ export default function AssignmentEditor() {
     assignments.find((x) => x._id === aid && String(x.course) === String(cid))
   );
 
-  /* -------------------- MOVE REFS ABOVE ANY EARLY RETURN (FIX) -------------------- */
+  
   const nameRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
   const pointsRef = useRef<HTMLInputElement>(null);
   const dueRef = useRef<HTMLInputElement>(null);
   const fromRef = useRef<HTMLInputElement>(null);
   const untilRef = useRef<HTMLInputElement>(null);
-  /* ------------------------------------------------------------------------------- */
+  
 
   useEffect(() => {
     if (aid === "new") {
@@ -71,7 +71,7 @@ export default function AssignmentEditor() {
     })();
   }, [a, aid, cid, dispatch]);
 
-  // keep the guard, but it's now AFTER all hooks were created
+  
   if (aid === "new") return null;
 
   if (!a) {
@@ -95,8 +95,8 @@ export default function AssignmentEditor() {
       title: nameRef.current?.value?.trim() || "",
       description: descRef.current?.value ?? "",
       points,
-      dueDate: localInputToISO(dueRef.current?.value || ""),
-      availableFrom: localInputToISO(fromRef.current?.value || ""),
+      due: localInputToISO(dueRef.current?.value || ""),
+      available: localInputToISO(fromRef.current?.value || ""),
       availableUntil: localInputToISO(untilRef.current?.value || ""),
     };
 
