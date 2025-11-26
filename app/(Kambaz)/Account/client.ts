@@ -1,8 +1,11 @@
 import axios from "axios";
 
+const HTTP_SERVER =
+  process.env.NEXT_PUBLIC_HTTP_SERVER || "http://localhost:4000";
+
 const axiosWithCredentials = axios.create({
-  withCredentials: true,
-  baseURL: "http://localhost:4000"
+  baseURL: HTTP_SERVER,  
+  withCredentials: true
 });
 
 
