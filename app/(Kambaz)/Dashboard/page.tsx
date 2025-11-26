@@ -54,7 +54,7 @@ export default function Dashboard() {
   const fetchEnrollments = async () => {
     if (!currentUser?._id) return;
     try {
-      // Just fetch the enrolled courses and convert to enrollment format
+      
       const enrolledCourses = await courseClient.findMyCourses();
       const enrollments = enrolledCourses.map((c: any) => ({
         _id: `${currentUser._id}-${c._id}`,
@@ -235,26 +235,27 @@ export default function Dashboard() {
                       {course.description}
                     </CardText>
 
-                    <Button variant="primary">Go</Button>
-                    <button
-                      id="wd-edit-course-click"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        setCourse(course);
-                      }}
-                      className="btn btn-warning me-2 float-end"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-danger float-end"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        onDeleteCourse(course._id);
-                      }}
-                    >
-                      Delete
-                    </button>
+                    <Button variant="primary" className="me-2">Go</Button>
+
+<button
+  id="wd-edit-course-click"
+  onClick={(event) => {
+    event.preventDefault();
+    setCourse(course);
+  }}
+  className="btn btn-warning float-end"
+>
+  Edit
+</button>
+<button
+  className="btn btn-danger float-end me-2"
+  onClick={(event) => {
+    event.preventDefault();
+    onDeleteCourse(course._id);
+  }}
+>
+  Delete
+</button>
                   </CardBody>
                 </Link>
               </Card>
