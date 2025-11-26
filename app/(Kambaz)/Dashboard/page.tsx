@@ -81,21 +81,26 @@ export default function Dashboard() {
     !!getEnrollment(String(currentUser?._id ?? ""), String(cid));
 
   const visibleCourses = useMemo(() => {
-    if (!currentUser?._id) return [];
-    if (showAll) return courses;
-    return courses.filter((c: any) =>
-      reduxEnrollments.some(
-        (e) =>
-          String(e.user) === String(currentUser._id) &&
-          String(e.course) === String(c._id)
-      )
-    );
-  }, [showAll, currentUser?._id, courses, reduxEnrollments]);
+  if (!currentUser?._id) return [];
+
+  if (showAll) return courses;
+
+
+  if (!reduxEnrollments.length) return courses;
+
+  return courses.filter((c: any) =>
+    reduxEnrollments.some(
+      (e) =>
+        String(e.user) === String(currentUser._id) &&
+        String(e.course) === String(c._id)
+    )
+  );
+}, [showAll, currentUser?._id, courses, reduxEnrollments]);
+
 
   const onAddNewCourse = async () => {
     const newCourse = await courseClient.createCourse(course);
     dispatch(setCourses([...courses, newCourse]));
-    // Enrollment is created on backend, just refresh
     await fetchEnrollments();
   };
 
