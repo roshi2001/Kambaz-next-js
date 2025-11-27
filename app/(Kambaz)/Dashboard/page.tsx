@@ -99,10 +99,21 @@ export default function Dashboard() {
 
 
   const onAddNewCourse = async () => {
-    const newCourse = await courseClient.createCourse(course);
-    dispatch(setCourses([...courses, newCourse]));
-    await fetchEnrollments();
-  };
+  const newCourse = await courseClient.createCourse(course);
+  dispatch(setCourses([...courses, newCourse]));
+  
+  
+  if (currentUser?.role === "FACULTY") {
+    dispatch(toggleEnrollment({
+      user: currentUser._id,
+      course: newCourse._id,
+      _id: `${currentUser._id}-${newCourse._id}`
+    }));
+  }
+  
+  
+  await fetchEnrollments();
+};
 
   const onDeleteCourse = async (courseId: string) => {
     await courseClient.deleteCourse(courseId);
