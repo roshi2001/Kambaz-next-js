@@ -17,7 +17,7 @@ export const signin = async (credentials: any) => {
 };
 
 export const profile = async () => {
-  const { data } = await axiosWithCredentials.get(`${USERS_API}/profile`);
+  const { data } = await axiosWithCredentials.post(`${USERS_API}/profile`);
   return data;
 };
 
