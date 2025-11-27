@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import PeopleTable from "./Table/page";
 
-const BASE_API =
-  process.env.NEXT_PUBLIC_BASE_API || "http://localhost:4000/api";
+const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER || "http://localhost:4000";
 
 export default function PeoplePage() {
   const { cid } = useParams<{ cid: string }>();
@@ -12,7 +11,7 @@ export default function PeoplePage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${BASE_API}/courses/${cid}/users`, {
+      const res = await fetch(`${HTTP_SERVER}/api/courses/${cid}/users`, {
         credentials: "include",
       });
       const data = await res.json();
